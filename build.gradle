@@ -1,0 +1,34 @@
+apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
+
+buildscript {
+    repositories {
+    	jcenter()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.8.RELEASE")
+    }
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile 'commons-cli:commons-cli:1.4'
+    compile('org.springframework.boot:spring-boot-starter'){
+		exclude module: 'log4j-over-slf4j'
+		exclude module: 'jul-to-slf4j'
+    }
+    compileOnly 'org.projectlombok:lombok:1.16.18'
+    testCompile 'junit:junit:4.12'
+}
+
+clean.doLast {
+    file('logs').deleteDir()
+    file('out').deleteDir()
+    file('bin').deleteDir()
+}
