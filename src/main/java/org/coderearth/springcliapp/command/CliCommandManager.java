@@ -69,25 +69,37 @@ public class CliCommandManager {
         this.helpFormatter.printHelp("java -jar spring-cli-app-<version>.jar --username=<username> --password=<key> --year=<year>", this.options);
     }
 
+    /**
+     * SRP says <code>parse</code> method should do exactly one and only one thing which is parse arguments and convert into
+     * <code>Command</code> which can be used by core application - it should not make System.exit() or some nasty thing
+     * with application work-flow itself. Because thats the responsibility of caller of this method and that will be
+     * notified by throwing <code>ParseException</code>
+     *
+     * @param args
+     * @return
+     * @throws ParseException
+     */
     public Command parse(String[] args) throws ParseException {
         final CommandLineParser commandLineParser = new DefaultParser();
 
         try {
             final CommandLine commandLine = commandLineParser.parse(this.getOptions(), args, false);
-            Integer year = null;
-            try {
-                year = Integer.parseInt(commandLine.getOptionValue("year"));
-            } catch (NumberFormatException nfe) {
-                throw new ParseException(nfe.getMessage());
-            }
             return Command
                     .builder()
                     .username(commandLine.getOptionValue("username"))
                     .password(commandLine.getOptionValue("password"))
-                    .year(Year.of(year))
+                    .year(Year.of(parseYear(commandLine.getOptionValue("year"))))
                     .build();
         } catch (ParseException e) {
             throw e;
+        }
+    }
+
+    private Integer parseYear(String year) throws ParseException {
+        try {
+            return Integer.parseInt(year);
+        } catch (NumberFormatException nfe) {
+            throw new ParseException(nfe.getMessage());
         }
     }
 
